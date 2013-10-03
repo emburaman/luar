@@ -1,10 +1,10 @@
-<h1>Cadastro de Nucleos</h1>
+<h1>Cadastro de Usuários</h1>
 
 <?php
 /* Define what DB table and form will be used in this form */
-$table = 'lr_nucleo';
-$frm = 'frm_nucleo';
-$id_col = 'id_nucleo';
+$table = 'lr_usuario';
+$frm = 'frm_usuario';
+$id_col = 'username';
 
 /* Check id form should be displayed or not */
 $st = true;
@@ -22,7 +22,7 @@ if ($_REQUEST['edit']) {
 $db = new db();
 
 if($_REQUEST['edit']) {
-	$list = $db->select($table,'*', "$id_col = ". $_REQUEST['edit']);
+	$list = $db->select($table,'*', "$id_col = '". $_REQUEST['edit'] ."'");
 	foreach ($list[0] as $k => $v) {
 		${$k} = $v;
 	}
@@ -31,11 +31,16 @@ if($_REQUEST['edit']) {
 /* Check if form was posted and if so, add record into DB */
 if ($_REQUEST['form']) {
 	/* Field mapping from form into DB table */
-	$id_nucleo = $_REQUEST['id_nucleo'];
-	$descricao = $_REQUEST['descricao'];
+	$id_usuario = $_REQUEST['id_usuario'];
+	$username = $_REQUEST['username'];
+  $senha = sha1($_REQUEST['senha']);
+
 	/* Preparing array of values to be saved into DB */
-	$cols = array('descricao' => "$descricao",
+	$cols = array('username' => "$username",
 								);
+	if ($_REQUEST['senha'] != '') {
+	  $cols = array('senha' => "$senha") + $cols;
+	}
 
 	if ($_REQUEST['enviar'] == 'edit_save') {
 		$where = "$id_col = ". $_REQUEST[$id_col];
@@ -70,12 +75,19 @@ if (!$st) {
 	<form id="cadastro_nucleo" name="cadastro_nucleo" method="post" action="index.php">
   <input type="hidden" id="p" name="p" value="<?php print $frm; ?>" />
   <input type="hidden" id="form" name="form" value="save" />
-  <input type="hidden" id="id_nucleo" name="id_nucleo" value="<?php print $id_nucleo; ?>" />
+  <input type="hidden" id="id_usuario" name="id_usuario" value="<?php print $id_usuario; ?>" />
   <div class="field odd first">
-    <div class="label">Descrição</div>
-    <div class="field"><input type="text" id="descricao" name="descricao" value="<?php print $descricao; ?>" /></div>
+    <div class="label">Usuário</div>
+    <div class="field"><input type="text" id="username" name="username" value="<?php print $username; ?>" /></div>
   </div>
-  <div class="field even"></div>
+  <div class="field even">
+    <div class="label">Senha</div>
+    <div class="field"><input type="password" id="senha" name="senha" value="<?php //print $senha; ?>" /></div>
+  </div>
+  <div class="field odd last">
+    <div class="label">Confirme a Senha</div>
+    <div class="field"><input type="password" id="cfsenha" name="cfsenha" value="<?php //print $senha; ?>" /></div>
+  </div>
   <div class="field action">
     <div class="field"><button type="submit" id="enviar" name="enviar" value="<?php print $btnval; ?>"><span class="icon"></span>Salvar</button></div>
   </div>
@@ -118,23 +130,19 @@ if (!$st) {
 
 <?php
 	/* List records */
-	$cols = $db->getColumnNames($table);
 ?>
-
 <table id="table" class="<?php print $table; ?>">
   <thead>
-    <tr><?php
-    $cabecalho = array("Núcleo", "Descrição");
-		foreach ($cabecalho as $k => $v) {
-			print "<th class=". $v .">$v</th>";
-		} ?>
+    <tr>
+    <td class="username">Username</td>
     <td width="1"><!-- Action column --></td>
     <td width="1"><!-- Action column --></td>
 		</tr>
 	</thead>
   <tbody>
 <?php
-	$list = $db->select($table);
+	$list = $db->getUsers();
+
 	for ($i = 0; $i < count($list); $i++) {
 		if ($i % 2 == 0) { $class = 'even'; } else { $class = 'odd'; }
 		print '<tr class="'. $class .'">';

@@ -1,6 +1,7 @@
 <?php
 /* Define what DB table and form will be used in this form */
 $table = 'lr_empresa';
+$view   = 'vlr_empresa';
 $frm = 'frm_empresa';
 $id_col = 'id_empresa';
 
@@ -20,9 +21,9 @@ if ($_REQUEST['edit']) {
 $db = new db();
 
 if($_REQUEST['edit']) {
-	$list = $db->select($table, "$id_col = ". $_REQUEST['edit']);
+	$list = $db->select($table,'*', "$id_col = ". $_REQUEST['edit']);
 	foreach ($list[0] as $k => $v) {
-		${$k} = $v;
+		$$k = $v;
 	}
 }
 
@@ -45,7 +46,7 @@ if ($_REQUEST['form']) {
 	$email_responsavel = $_REQUEST['email_responsavel'];
 	$id_nucleo = $_REQUEST['id_nucleo'];
 	$id_voluntario_captador = $_REQUEST['id_voluntario_captador'];
-	$bservacao = $_REQUEST['observacao'];
+	$observacao = $_REQUEST['observacao'];
 
 	/* Preparing array of values to be saved into DB */
 	$cols = array('razao_social' => $razao_social,
@@ -92,6 +93,10 @@ if ($_REQUEST['form']) {
 <h1>Cadastro de Empresas</h1>
 
 <?php 
+
+//importa o arquivo funcao_combo.php
+  include_once('combobox.php');
+  
 if (!$st) { 
   if ($_REQUEST['add']) {
 		$btnval = 'save';
@@ -115,6 +120,22 @@ if (!$st) {
   <div class="field even">
   <div class="label">Nome Fantasia</div>
   <div class="field"><input type="text" id="nome_fantasia" name="nome_fantasia" value="<?php print $nome_fantasia; ?>" /></div>
+  </div>
+  
+  <div class="field odd">
+          <div class="label">Núcleo</div>
+          <div class="field"> 
+            <?php
+              
+              $db = new db();
+              
+              $list = $db->select('lr_nucleo');
+             
+              //print_r('$list: '.$list);
+              
+              print ComboBox('id_nucleo', $list, $id_nucleo);
+            ?>
+          </div>
   </div>
   
   <div class="field odd">
@@ -220,12 +241,13 @@ if (!$st) {
 <?php
 	/* List records */
   $db = new db();
-	$cols = $db->getColumnNames($table);
+	$cols = $db->getColumnNames($view);
 ?>
-<table id="table" class="<?php print $table; ?>">
+<table id="table" class="<?php print $view; ?>">
   <thead>
     <tr><?php
-		foreach ($cols as $k => $v) {
+    $cabecalho = array("Nome Empresa", "Cnpj", "Endereço",  "Bairro", "Responsável", "Tel. Resp.", "Email", "Núcleo");
+    foreach ($cabecalho as $k => $v) {
 			print "<th class=". $v .">$v</th>";
 		} ?>
     <td width="1"><!-- Action column --></td>
@@ -234,7 +256,7 @@ if (!$st) {
 	</thead>
   <tbody>
 <?php
-	$list = $db->select($table);
+	$list = $db->select($view);
 	for ($i = 0; $i < count($list); $i++) {
 		if ($i % 2 == 0) { $class = 'even'; } else { $class = 'odd'; }
 		print '<tr class="'. $class .'">';
@@ -242,6 +264,10 @@ if (!$st) {
 			if ($k == $id_col) { $id = $v; }
 			print "<td class=". $k .">$v</td>";
 		}
+		
+		$id = $db->select($table, 'id_empresa', "cnpj = ". $list[$i]['cnpj']);
+		$id = $id[0]['id_empresa'];
+		
 		print '<form method="post" action="index.php">
 					<input type="hidden" id="p" name="p" value="'. $frm .'" />
 					<td><button class="edit" type="submit" id="edit" name="edit" value="'. $id .'">Y</button></td>

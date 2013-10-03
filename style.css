@@ -3,7 +3,7 @@
 
 * {
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10px;
+	font-size: 12px;
 }
 h1 {
 	color: #5a9f90;
@@ -115,7 +115,8 @@ ul, li {
 .field .field {
 	min-width: 450px;
 }
-.field .field input {
+.field .field input,
+.field .field select {
 	-moz-border-radius: 20px;
 	-webkit-border-radius: 20px;
 	-khtml-border-radius: 20px;

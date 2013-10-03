@@ -19,7 +19,8 @@ include_once('class.db.php');
   <ul id="main-menu">
     <li class="odd first"><a href="index.php?p=frm_empresa">Cadastro de Empresas</a></li>
     <li class="even"><a href="index.php?p=frm_voluntario">Cadastro de Voluntários</a></li>
-    <li class="odd last"><a href="index.php?p=frm_nucleo">Cadastro de Núcleos</a></li>
+    <li class="odd"><a href="index.php?p=frm_nucleo">Cadastro de Núcleos</a></li>
+    <li class="even last"><a href="index.php?p=frm_usuario">Cadastro de Usuários</a></li>
   </ul>
   <?php } ?>
 
