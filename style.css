@@ -1,0 +1,209 @@
+@charset "utf-8";
+/* CSS Document */
+
+* {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+h1 {
+	color: #5a9f90;
+	font-size: 200%;
+}
+p {
+	margin: 5px 10px;
+}
+pre {
+	background-color: #CCC;
+	border: 1px solid #666;
+	font-family: "Lucida Console", Monaco, monospace;
+	padding: 10px;
+}
+a {
+	text-decoration: none;
+}
+ul, li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#header {
+	background-color: #D3DDDF;
+	clear: both;
+	display: block;
+	margin: -7px -7px 10px -7px;
+	overflow: hidden;
+	padding: 3px;
+}
+#main-menu li,
+#user-menu li {
+	border: 1px solid #CCC;
+	float: left;
+	overflow: hidden;
+}
+#main-menu li {
+	margin-right: 10px;
+}
+#user-menu li {
+	margin-left: 10px;
+}
+#main-menu li a,
+#user-menu li a {
+	background-color: #999;
+	color: #FFF;
+	display: block;
+	padding: 5px 8px;
+}
+#main-menu li a:hover,
+#user-menu li a:hover {
+	background-color: #5a9f90;
+	color: #FFF;
+}
+#user-menu li.welcome {
+	border: none;
+	padding-top: 6px;
+}
+#main-menu {
+	float: left;
+}
+
+#user-menu {
+	float: right;
+}
+
+#error {
+	background-color: #FCF;
+	border: 1px solid red;
+	color: red;
+	margin-bottom: 10px;
+}
+
+#table {
+	border: 1px solid #999;
+	border-spacing: 0;
+	border-collapse: collapse;
+	width: 100%;
+}
+#table th,
+#table td {
+	margin: 0;
+	padding: 3px 5px;
+	text-align: left;
+}
+#table tr.odd {
+	background-color: #EFEFEF;
+}
+#table thead tr {
+	background-color: #CCC;
+}
+#table tbody tr:hover {
+	background-color: #D3DDDF;
+}
+
+/* Layout of forms */
+.field {
+	overflow: hidden;
+	margin-bottom: 3px;
+}
+.field .label,
+.field .field {
+	float: left;
+}
+.field .label {
+	width: 150px;
+}
+.field .field {
+	min-width: 450px;
+}
+.field .field input {
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	-khtml-border-radius: 20px;
+	border-radius: 20px;
+	border: 1px solid #CCC;
+	padding: 3px 5px;
+	width: 90%;
+}
+.field.action #enviar {
+	margin-top: 10px;
+}
+button#novo,
+button#enviar,
+button#sim,
+button#cancel {
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	-khtml-border-radius: 20px;
+	border-radius: 20px;
+	border: 1px solid #CCC;
+	float: left;
+	font-weight: bold;
+	line-height: 190%;
+	margin: 0 10px 10px 0;
+	padding: 2px 10px 2px 5px;
+}
+.add-button {
+	float: right;
+}
+button#novo,
+button#enviar {
+	float: none;
+}
+.msg.success .icon,
+.msg.fail .icon,
+button#novo .icon,
+button#enviar .icon,
+button#sim .icon,
+button#cancel .icon {
+	background: transparent url(sprites.png) -96px 2px no-repeat;
+	border: none;
+	display: block;
+	float: left;
+	height: 20px;
+	text-indent: -999px;
+	width: 20px;
+}
+button#enviar .icon,
+button#sim .icon {
+	background-position: -32px;
+}
+button#cancel .icon {
+	background-position: -64px;
+}
+button.del,
+button.edit {
+	background: transparent url(sprites.png) -224px 0 no-repeat;
+	border: none;
+	height: 20px;
+	text-indent: -999px;
+	width: 20px;
+}
+button.del {
+	background-position: -192px 0;
+}
+
+.msg {
+	font-weight: bold;
+	line-height: 190%;
+	margin-bottom: 10px;
+	padding: 10px;
+}
+.msg.success {
+	border: 1px solid #6C3;
+	background-color: #C9EAB3;
+}
+.msg.fail {
+	border: 1px solid #F69;
+	background-color: #FECFDB;
+}
+.msg .icon {
+	margin-right: 5px;
+}
+.msg.success .icon {
+	background-position: -32px;
+	
+}
+.msg.fail .icon {
+	background-position: -64px;
+}
+
