@@ -1,10 +1,11 @@
 <?php
-
 /* Define what DB table and form will be used in this form */
 $table  = 'lr_voluntario';
+$table_user  = 'lr_usuario';
 $view   = 'vlr_voluntario';
 $frm    = 'frm_voluntario';
 $id_col = 'id_voluntario';
+$id_col_user = 'username';
 
 /* Check id form should be displayed or not */
 $st = true;
@@ -22,7 +23,7 @@ if ($_REQUEST['edit']) {
 $db = new db();
 
 if($_REQUEST['edit']) {
-	$list = $db->select($table, "$id_col = ". $_REQUEST['edit']);
+	$list = $db->select($table,'*', "$id_col = ". $_REQUEST['edit']);
 	foreach ($list[0] as $k => $v) {
 		${$k} = $v;
 	}
@@ -48,15 +49,40 @@ if ($_REQUEST['form']) {
 	$email  = $_REQUEST['email'];
 	$id_entidade = $_REQUEST['id_entidade'];
   $id_nucleo = $_REQUEST['id_nucleo'];
+	
   $username = $_REQUEST['username'];
+	$password = $_REQUEST['senha'];
+	$confirmp = $_REQUEST['cfsenha'];
+
+	if (($username != '' && $password == '') || ($username == '' && $password != '')) {
+		print '<div class="msg fail"><span class="icon"></span>Você está tentando criar um usuário para este voluntário? Parece que você não digitou os dados corretamente.</div>';
+		$st = false;
+	}
+	if ($username != '' && $password != '') {
+		include_once "class.user.php";
+		$usr = new User();
+		$cols_user = array();
+		
+		if ($password != $confirmp) {
+			print '<div class="msg fail"><span class="icon"></span>Ops! Parece que você não digitou a senha corretamente.</div>';
+			$st = false;
+		}
+		if ($usr->validatePassword($password) != true) {
+			print '<div class="msg fail"><span class="icon"></span>Oh oh! Sua senha não é forte o suficiente. Feche os olhos, respire fundo e pense no Chuck Norris. Em seguida tente novamente. Dica: sua senha deve ter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractér especial (.:<>:! etc.).</div>';
+			$st = false;
+		}
+		
+		/* Preparing array of values to be saved into DB */
+		$cols_user = array('username' => "$username", 'senha' => sha1($password));
+	}
+
 
 	/* Preparing array of values to be saved into DB */
-	$cols = array('id_voluntario' => $id_voluntario,
-                'id_tipo_voluntario' => $id_tipo_voluntario,
+	$cols = array('id_tipo_voluntario' => $id_tipo_voluntario,
                 'id_status' => $id_status,
                 'nome' => $nome,
                 'cpf' => $cpf,
-                'rg' => $rg,
+                'rg' => "$rg ",
                 'dt_nascimento' => $dt_nascimento,
                 'endereco' => $endereco,
                 'bairro' => $bairro,
@@ -71,95 +97,45 @@ if ($_REQUEST['form']) {
                 'username' => $username
 							 );
 
-  // Atualizando o nivel de acesso do usuário nas telas
-  $tb_acesso_usuario = "lr_rel_acesso_usuario_tela";
-  $tb_config_acesso_usuario = "lr_config_acesso_tipo_volunt";
-  
-  //$rs_config_acesso_usuario = $db->select($tb_config_acesso_usuario); 
-  
-  //$query = "SELECT * from lr_config_acesso_tipo_volunt where id_tipo_voluntario = " . $id_tipo_voluntario;
-  
-  $rs_config_acesso_usuario = $db->select( $tb_config_acesso_usuario, ' id_tipo_voluntario = ' . $id_tipo_voluntario );
-  
-	if ($_REQUEST['enviar'] == 'edit_save') 
-  {
+	if ($_REQUEST['enviar'] == 'edit_save' && $st != false) {
 		$where = "$id_col = ". $_REQUEST[$id_col];
-		
-    if ($db->update($table, $cols, $where)) 
-    {
-		  $st = true;
-		  print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
-	  } 
-    else 
-    {
-		 	$st = false;
-		 	print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
+		if ($username != '' && $password != '') {
+		  $where_user = "$id_col_user = '". $_REQUEST[$id_col_user] ."'";
 		}
-    
-    // Atualizando o nivel de acesso do usuário nas telas
 
-    foreach( $rs_config_acesso_usuario as $linha )
-    {
-      echo $linha['id_tela'];
-      echo $linha['cod_nivel_acesso'];
-      $cols_acesso = array('username' => $username,
-                           'id_tela' => $linha['id_tela'],
-                           'cod_nivel_acesso' => $linha['cod_nivel_acesso']);
-      
-      $where_acesso_usuario = ' username = ' . $username . ' and id_tela = ' . $linha['id_tela'];
-      
-      echo $where_acesso_usuario;
-      
-      if ($db->update($tb_acesso_usuario, $cols_acesso, $where_acesso_usuario)) 
-      {
-        $st = true;
-        //print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
-      } 
-      else 
-      {
-        $st = false;
-        print '<div class="msg fail"><span class="icon"></span>Erro ao atualizar o nível de acesso do usuário.</div>';
-      }
-            
-    }
-
-	} 
-  elseif ($_REQUEST['enviar'] == 'save') 
-  {
-		/* Savind new record into DB */
-		if ($db->insert($table, $cols)) 
-    {
+		if ($db->update($table, $cols, $where)) {
 			$st = true;
 			print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
-		} 
-    else 
-    {
+			if ($username != '' && $password != '') {
+				if ($db->update($table_user, $cols_user, $where_user)) {
+					print '<div class="msg success"><span class="icon"></span>O usuário deste voluntário foi salvo com sucesso.</div>';
+				} else {
+					print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o usuário deste voluntário.</div>';
+				}
+			}
+		} else {
 			$st = false;
 			print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
 		}
-    
-    // Inserindo o nivel de acesso do usuário nas telas
-    foreach( $rs_config_acesso_usuario as $linha )
-    {
-      
-      $cols_acesso = array('username' => $username,
-                           'id_tela' => $linha['id_tela'],
-                           'cod_nivel_acesso' => $linha['cod_nivel_acesso']);
-      
-      if ($db->insert($tb_acesso_usuario, $cols_acesso)) 
-      {
-        $st = true;
-        //print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
-      } 
-      else 
-      {
-        $st = false;
-        print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
-      }
-            
-    }
+	} elseif ($_REQUEST['enviar'] == 'save' && $st != false) {
+		/* Savind new record into DB */
+		if ($db->insert($table, $cols)) {
+			$st = true;
+			print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
+			if ($username != '' && $password != '') {
+				if ($db->insert($table_user, $cols_user, $where_user)) {
+					print '<div class="msg success"><span class="icon"></span>O usuário deste voluntário foi salvo com sucesso.</div>';
+				} else {
+					print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o usuário deste voluntário.</div>';
+				}
+			}
+		} else {
+			$st = false;
+			print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
+		}
 	}
 }
+
 
 /* Start HTML */
 ?>
@@ -186,7 +162,6 @@ if (!$st) {
   <input type="hidden" id="id_status" name="id_status" value="<?php print $id_status; ?>" />
   <input type="hidden" id="id_entidade" name="id_entidade" value="<?php print $id_entidade; ?>" />
   <input type="hidden" id="id_nucleo" name="id_nucleo" value="<?php print $id_nucleo; ?>" />
-  <input type="hidden" id="username" name="username" value="<?php print $username; ?>" />
 
   <div class="field odd first">
     <div class="label">Nome</div>
@@ -197,13 +172,8 @@ if (!$st) {
         <div class="label">Tipo Voluntário</div>
         <div class="field"> 
           <?php
-            
             $db = new db();
-            
             $list = $db->select('lr_tipo_voluntario');
-           
-            //print_r('$list: '.$list);
-            
             print ComboBox('id_tipo_voluntario', $list, $id_tipo_voluntario);
           ?>
         </div>
@@ -213,13 +183,8 @@ if (!$st) {
         <div class="label">Núcleo</div>
         <div class="field"> 
           <?php
-            
             $db = new db();
-            
             $list = $db->select('lr_nucleo');
-           
-            //print_r('$list: '.$list);
-            
             print ComboBox('id_nucleo', $list, $id_nucleo);
           ?>
         </div>
@@ -229,42 +194,27 @@ if (!$st) {
     <div class="label">Entidade</div>
     <div class="field"> 
       <?php
-        
         $db = new db();
-        
         $list = $db->select('lr_entidade');
-       
-        //print_r('$list: '.$list);
-        
         print ComboBox('id_entidade', $list, $id_entidade);
       ?>
     </div>
   </div>
   
-  <div class="field even">
+  <div class="field odd">
         <div class="label">Status</div>
         <div class="field"> 
           <?php
-            
             $db = new db();
-            
             $list = $db->select('lr_status');
-           
-            //print_r('$list: '.$list);
-            
             print ComboBox('id_status', $list, $id_status);
           ?>
         </div>
   </div>
   
   <div class="field even">
-      <div class="label">Usuário</div>
-      <div class="field"><input type="text" id="username" name="username" value="<?php print $username; ?>" /></div>
-  </div>
-  
-  <div class="field even">
     <div class="label">CPF</div>
-    <div class="field"><input type="text" id="cpf" name="cpf" value="<?php print $cpf; ?>" /></div>
+    <div class="field"><input type="number" id="cpf" name="cpf" value="<?php print $cpf; ?>" /></div>
   </div>
   
   <div class="field odd">
@@ -274,7 +224,7 @@ if (!$st) {
   
   <div class="field even">
     <div class="label">Data Nascimento</div>
-    <div class="field"><input type="text" id="dt_nascimento" name="dt_nascimento" value="<?php print $dt_nascimento; ?>" /></div>
+    <div class="field"><input type="date" id="dt_nascimento" name="dt_nascimento" value="<?php print $dt_nascimento; ?>" /></div>
   </div>
   
   <div class="field odd">
@@ -299,7 +249,7 @@ if (!$st) {
   
   <div class="field odd">
     <div class="label">Cep</div>
-    <div class="field"><input type="text" id="cep" name="cep" value="<?php print $cep; ?>" /></div>
+    <div class="field"><input type="number" id="cep" name="cep" value="<?php print $cep; ?>" /></div>
   </div>
   
   <div class="field even">
@@ -313,9 +263,25 @@ if (!$st) {
   </div>
   
   <div class="field even last">
-    <div class="label">email</div>
-    <div class="field"><input type="text" id="email" name="email" value="<?php print $email; ?>" /></div>
+    <div class="label">E-mail</div>
+    <div class="field"><input type="email" id="email" name="email" value="<?php print $email; ?>" /></div>
   </div>
+
+  <fieldset>
+  <div class="field odd first">
+    <div class="label">Usuário</div>
+    <div class="field"><input type="text" id="username" name="username" value="<?php print $username; ?>" /></div>
+  </div>
+  <div class="field even">
+    <div class="label">Senha</div>
+    <div class="field"><input type="password" id="senha" name="senha" value="<?php //print $senha; ?>" /></div>
+  </div>
+  <div class="field odd last">
+    <div class="label">Confirme a Senha</div>
+    <div class="field"><input type="password" id="cfsenha" name="cfsenha" value="<?php //print $senha; ?>" /></div>
+  </div>
+  </fieldset>
+
 
   <div class="field action">
     <div class="field"><button type="submit" id="enviar" name="enviar" value="<?php print $btnval; ?>"><span class="icon"></span>Salvar</button></div>

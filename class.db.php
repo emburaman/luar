@@ -43,8 +43,8 @@ class db {
 		$col = '';
 		$val = '';
 		$i = 1;
-
-		foreach ($columns as $k => $v) {
+		
+  	foreach ($columns as $k => $v) {
 			if ($i < count($columns)) {
 				$comma = ", ";
 			} else {
@@ -61,6 +61,7 @@ class db {
 		}
 		
     $sql = "INSERT INTO $table ($col) VALUE ($val)";
+
     $qry = $this->conn->prepare($sql);
 		if ($qry->execute()) {
 		  return true;

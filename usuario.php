@@ -30,20 +30,30 @@ if($_REQUEST['edit']) {
 
 /* Check if form was posted and if so, add record into DB */
 if ($_REQUEST['form']) {
-	/* Field mapping from form into DB table */
-	$id_usuario = $_REQUEST['id_usuario'];
-	$username = $_REQUEST['username'];
-  $senha = sha1($_REQUEST['senha']);
+  /* Field mapping from form into DB table */
+	$id_col   = $_REQUEST[$id_col];
+  $username = $_REQUEST['username'];
+	$password = $_REQUEST['senha'];
+	$confirmp = $_REQUEST['cfsenha'];
 
+  include_once 'class.user.php';
+  $usr = new User();
+  
+  if ($password != $confirmp) {
+		print '<div class="msg fail"><span class="icon"></span>Ops! Parece que você não digitou a senha corretamente.</div>';
+		$st = false;
+  }
+  if ($usr->validatePassword($password) != true) {
+		print '<div class="msg fail"><span class="icon"></span>Oh oh! Sua senha não é forte o suficiente. Feche os olhos, respire fundo e pense no Chuck Norris. Em seguida tente novamente. Dica: sua senha deve ter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractér especial (.:<>:! etc.).</div>';
+		$st = false;
+  }
+  
 	/* Preparing array of values to be saved into DB */
-	$cols = array('username' => "$username",
-								);
-	if ($_REQUEST['senha'] != '') {
-	  $cols = array('senha' => "$senha") + $cols;
-	}
+	$cols = array('username' => "$username", 'senha' => "$password");
 
-	if ($_REQUEST['enviar'] == 'edit_save') {
-		$where = "$id_col = ". $_REQUEST[$id_col];
+	if ($_REQUEST['enviar'] == 'edit_save' && $st == true) {
+		$where = "$id_col = $id_col";
+    
 		if ($db->update($table, $cols, $where)) {
 			$st = true;
 			print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
@@ -51,7 +61,7 @@ if ($_REQUEST['form']) {
 			$st = false;
 			print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
 		}
-	} elseif ($_REQUEST['enviar'] == 'save') {
+	} elseif ($_REQUEST['enviar'] == 'save' && $st == true) {
 		/* Savind new record into DB */
 		if ($db->insert($table, $cols)) {
 			$st = true;
@@ -115,7 +125,7 @@ if (!$st) {
 	if ($_REQUEST['delcfm']) {
 		$id = $_REQUEST['delcfm'];
 	  $db = new db();
-		if ($db->delete($table, "$id_col = $id")) {
+		if ($db->delete($table, "$id_col = '$id'")) {
 			print '<div class="msg success"><span class="icon"></span>O registro foi excluído com sucesso.</div>';
 		} else {
 			print '<div class="msg fail"><span class="icon"></span>Não foi possível excluir o registro.</div>';
