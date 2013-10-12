@@ -116,7 +116,13 @@ ul, li {
 	background-color: #EFEFEF;
 }
 #table thead tr {
-	background-color: #CCC;
+	background-color: #E74C3C;
+	color: #FFF;
+	font-weight: 900;
+	text-transform: uppercase;
+}
+#table thead tr td {
+	font-size: 10px;
 }
 #table tbody tr:hover {
 	background-color: #D3DDDF;
