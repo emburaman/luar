@@ -291,6 +291,7 @@ if (!$st) {
   </div>
 
   <fieldset class="userdata">
+  <p>Se você deseja criar um usuário para este voluntário, preencha os campos abaixo.</p>
   <div class="field odd first">
     <div class="label">Usuário</div>
     <div class="field"><input type="text" id="username" name="username" value="<?php print $username; ?>" /></div>
