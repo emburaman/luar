@@ -1,13 +1,15 @@
 <?php
-session_start();
+if (!isset($_SESSION)) { session_start(); }
 
 include_once 'class.db.php';
 include_once 'class.user.php';
 
-$error  = '';
 $action = 0;
+$error  = '';
+$error_div = '';
+$username = '';
 
-if (isset($_REQUEST['a'])) { $action = $_REQUEST['a']; }
+if (isset($_POST['a'])) { $action = $_POST['a']; }
 
 switch ($action) {
 	case 0: 
@@ -15,8 +17,8 @@ switch ($action) {
 		break;
 		
 	case 1: 
-		$username = $_REQUEST['username'];
-		$password = $_REQUEST['password'];
+		$username = $_POST['username'];
+		$password = $_POST['password'];
 		$action   = 2;
 		if ($username == '' || $password == '') {
 			$error .= '<p>Campo usuário ou senha preenchidos incorretamente.</p>';

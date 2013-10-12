@@ -1,20 +1,32 @@
 @charset "utf-8";
 /* CSS Document */
+@import url(http://fonts.googleapis.com/css?family=Raleway:900,700,500,300);
+
+/* COLOR PALLETE */
+/* Blue 			: #245BB0 */
+/* Light Blue	: #53A7DB */
+/* Background : #ACE4F1 */
+/* Dark 			: #2C3E50 */
+/* Red			 	: #E74C3C */
+
 
 * {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: 'Raleway', Arial, Helvetica, sans-serif;
 	font-size: 12px;
 }
 h1 {
-	color: #5a9f90;
-	font-size: 200%;
+	color: #2569B2;
+	font-size: 300%;
+	font-weight: 300;
+	letter-spacing: -0.05em;
+	margin: 5px 0;
 }
 p {
 	margin: 5px 10px;
 }
 pre {
-	background-color: #CCC;
-	border: 1px solid #666;
+	background-color: #EFEFEF;
+	border: 1px solid #2569B2;
 	font-family: "Lucida Console", Monaco, monospace;
 	padding: 10px;
 }
@@ -28,16 +40,17 @@ ul, li {
 }
 
 #header {
-	background-color: #D3DDDF;
+	background-color: #91BED4;
 	clear: both;
 	display: block;
 	margin: -7px -7px 10px -7px;
 	overflow: hidden;
 	padding: 3px;
+	position: relative;
 }
 #main-menu li,
 #user-menu li {
-	border: 1px solid #CCC;
+	border: 1px solid #304269;
 	float: left;
 	overflow: hidden;
 }
@@ -49,14 +62,23 @@ ul, li {
 }
 #main-menu li a,
 #user-menu li a {
-	background-color: #999;
+	background-color: #53A7DB;
 	color: #FFF;
 	display: block;
 	padding: 5px 8px;
 }
+#main-menu li.active {
+	border-bottom: none;
+	margin-bottom: -10px;
+}
+#main-menu li.active a {
+	background-color: #FFF;
+	color: #000;
+	padding-bottom: 15px;
+}
 #main-menu li a:hover,
 #user-menu li a:hover {
-	background-color: #5a9f90;
+	background-color: #245BB0;
 	color: #FFF;
 }
 #user-menu li.welcome {
@@ -110,6 +132,7 @@ ul, li {
 	float: left;
 }
 .field .label {
+	line-height: 25px;
 	width: 150px;
 }
 .field .field {
@@ -117,13 +140,17 @@ ul, li {
 }
 .field .field input,
 .field .field select {
-	-moz-border-radius: 20px;
-	-webkit-border-radius: 20px;
-	-khtml-border-radius: 20px;
-	border-radius: 20px;
 	border: 1px solid #CCC;
 	padding: 3px 5px;
 	width: 90%;
+}
+fieldset.userdata {
+	border: 1px solid #53A7DB;
+	padding-top: 12px;
+}
+.field.action {
+	border-top: 1px solid #efefef;
+	margin-top: 10px;
 }
 .field.action #enviar {
 	margin-top: 10px;
@@ -132,10 +159,6 @@ button#novo,
 button#enviar,
 button#sim,
 button#cancel {
-	-moz-border-radius: 20px;
-	-webkit-border-radius: 20px;
-	-khtml-border-radius: 20px;
-	border-radius: 20px;
 	border: 1px solid #CCC;
 	float: left;
 	font-weight: bold;

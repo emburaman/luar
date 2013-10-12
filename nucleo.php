@@ -8,37 +8,37 @@ $id_col = 'id_nucleo';
 
 /* Check id form should be displayed or not */
 $st = true;
-if ($_REQUEST['add'] || $_REQUEST['edit']) {
+if (isset($_POST['add']) || isset($_POST['edit'])) {
 	$st = false;
 }
-if ($_REQUEST['del']) {
+if (isset($_POST['del'])) {
 	$st = true;
 }
-if ($_REQUEST['edit']) {
+if (isset($_POST['edit'])) {
 	$st = false;
 }
 
 /* Starting DB */
 $db = new db();
 
-if($_REQUEST['edit']) {
-	$list = $db->select($table,'*', "$id_col = ". $_REQUEST['edit']);
+if (isset($_POST['edit'])) {
+	$list = $db->select($table,'*', "$id_col = ". $_POST['edit']);
 	foreach ($list[0] as $k => $v) {
 		${$k} = $v;
 	}
 }
 
 /* Check if form was posted and if so, add record into DB */
-if ($_REQUEST['form']) {
+if (isset($_POST['form'])) {
 	/* Field mapping from form into DB table */
-	$id_nucleo = $_REQUEST['id_nucleo'];
-	$descricao = $_REQUEST['descricao'];
+	$id_nucleo = $_POST['id_nucleo'];
+	$descricao = $_POST['descricao'];
 	/* Preparing array of values to be saved into DB */
 	$cols = array('descricao' => "$descricao",
 								);
 
-	if ($_REQUEST['enviar'] == 'edit_save') {
-		$where = "$id_col = ". $_REQUEST[$id_col];
+	if ($_POST['enviar'] == 'edit_save') {
+		$where = "$id_col = ". $_POST[$id_col];
 		if ($db->update($table, $cols, $where)) {
 			$st = true;
 			print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
@@ -46,7 +46,7 @@ if ($_REQUEST['form']) {
 			$st = false;
 			print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
 		}
-	} elseif ($_REQUEST['enviar'] == 'save') {
+	} elseif ($_POST['enviar'] == 'save') {
 		/* Savind new record into DB */
 		if ($db->insert($table, $cols)) {
 			$st = true;
@@ -60,9 +60,9 @@ if ($_REQUEST['form']) {
 
 /* Start HTML */
 if (!$st) { 
-  if ($_REQUEST['add']) {
+  if (isset($_POST['add'])) {
 		$btnval = 'save';
-	} elseif ($_REQUEST['edit']) {
+	} elseif (isset($_POST['edit'])) {
 		$btnval = 'edit_save';
 	}
 ?>
@@ -82,10 +82,10 @@ if (!$st) {
   </form>
 </div>
 <?php 
-} elseif ($_REQUEST['edit']) {
+} elseif (isset($_POST['edit'])) {
 	
-} elseif ($_REQUEST['del']) {
-	$id = $_REQUEST['del'];
+} elseif (isset($_POST['del'])) {
+	$id = $_POST['del'];
 	?>
 	<h3>Tem certeza que deseja excluir este registro?</h3>
 	<div class="del-button"><form method="post" action="index.php">
@@ -100,8 +100,8 @@ if (!$st) {
 	<?php
 
 } else {
-	if ($_REQUEST['delcfm']) {
-		$id = $_REQUEST['delcfm'];
+	if (isset($_POST['delcfm'])) {
+		$id = $_POST['delcfm'];
 	  $db = new db();
 		if ($db->delete($table, "$id_col = $id")) {
 			print '<div class="msg success"><span class="icon"></span>O registro foi excluído com sucesso.</div>';

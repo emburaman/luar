@@ -7,46 +7,65 @@ $id_col = 'id_empresa';
 
 /* Check id form should be displayed or not */
 $st = true;
-if ($_REQUEST['add'] || $_REQUEST['edit']) {
+if (isset($_POST['add']) || isset($_POST['edit'])) {
 	$st = false;
 }
-if ($_REQUEST['del']) {
+if (isset($_POST['del'])) {
 	$st = true;
 }
-if ($_REQUEST['edit']) {
+if (isset($_POST['edit'])) {
 	$st = false;
 }
 
 /* Starting DB */
 $db = new db();
 
-if($_REQUEST['edit']) {
-	$list = $db->select($table,'*', "$id_col = ". $_REQUEST['edit']);
+if(isset($_POST['edit'])) {
+	$list = $db->select($table,'*', "$id_col = ". $_POST['edit']);
 	foreach ($list[0] as $k => $v) {
 		$$k = $v;
 	}
 }
 
+/* Declaring the form variables */
+$id_empresa = '';
+$razao_social = '';
+$nome_fantasia = '';
+$cnpj = '';
+$endereco = '';
+$bairro = '';
+$cidade = '';
+$estado = '';
+$cep = '';
+$telefone = '';
+$email = '';
+$nome_responsavel = '';
+$telefone_responsavel = '';
+$email_responsavel = '';
+$id_nucleo = '';
+$id_voluntario_captador = '';
+$observacao = '';
+
 /* Check if form was posted and if so, add record into DB */
-if ($_REQUEST['form']) {
+if (isset($_POST['form'])) {
 	/* Field mapping from form into DB table */
-	$id_empresa = $_REQUEST['id_empresa'];
-  $razao_social = $_REQUEST['razao_social'];
-	$nome_fantasia = $_REQUEST['nome_fantasia'];
-	$cnpj = $_REQUEST['cnpj'];
-	$endereco = $_REQUEST['endereco'];
-	$bairro = $_REQUEST['bairro'];
-	$cidade = $_REQUEST['cidade'];
-	$estado = $_REQUEST['estado'];
-	$cep = $_REQUEST['cep'];
-	$telefone = $_REQUEST['telefone'];
-	$email = $_REQUEST['email'];
-	$nome_responsavel = $_REQUEST['nome_responsavel'];
-	$telefone_responsavel = $_REQUEST['telefone_responsavel'];
-	$email_responsavel = $_REQUEST['email_responsavel'];
-	$id_nucleo = $_REQUEST['id_nucleo'];
-	$id_voluntario_captador = $_REQUEST['id_voluntario_captador'];
-	$observacao = $_REQUEST['observacao'];
+	$id_empresa = $_POST['id_empresa'];
+  $razao_social = $_POST['razao_social'];
+	$nome_fantasia = $_POST['nome_fantasia'];
+	$cnpj = $_POST['cnpj'];
+	$endereco = $_POST['endereco'];
+	$bairro = $_POST['bairro'];
+	$cidade = $_POST['cidade'];
+	$estado = $_POST['estado'];
+	$cep = $_POST['cep'];
+	$telefone = $_POST['telefone'];
+	$email = $_POST['email'];
+	$nome_responsavel = $_POST['nome_responsavel'];
+	$telefone_responsavel = $_POST['telefone_responsavel'];
+	$email_responsavel = $_POST['email_responsavel'];
+	$id_nucleo = $_POST['id_nucleo'];
+	$id_voluntario_captador = $_POST['id_voluntario_captador'];
+	$observacao = $_POST['observacao'];
 
 	/* Preparing array of values to be saved into DB */
 	$cols = array('razao_social' => $razao_social,
@@ -67,8 +86,8 @@ if ($_REQUEST['form']) {
 								'observacao' => $observacao,
 								);
 
-	if ($_REQUEST['enviar'] == 'edit_save') {
-		$where = "$id_col = ". $_REQUEST[$id_col];
+	if ($_POST['enviar'] == 'edit_save') {
+		$where = "$id_col = ". $_POST[$id_col];
 		if ($db->update($table, $cols, $where)) {
 			$st = true;
 			print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
@@ -76,7 +95,7 @@ if ($_REQUEST['form']) {
 			$st = false;
 			print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
 		}
-	} elseif ($_REQUEST['enviar'] == 'save') {
+	} elseif ($_POST['enviar'] == 'save') {
 		/* Savind new record into DB */
 		if ($db->insert($table, $cols)) {
 			$st = true;
@@ -98,9 +117,9 @@ if ($_REQUEST['form']) {
   include_once('combobox.php');
   
 if (!$st) { 
-  if ($_REQUEST['add']) {
+  if (isset($_POST['add'])) {
 		$btnval = 'save';
-	} elseif ($_REQUEST['edit']) {
+	} elseif (isset($_POST['edit'])) {
 		$btnval = 'edit_save';
 	}
 ?>
@@ -125,21 +144,16 @@ if (!$st) {
   <div class="field odd">
           <div class="label">Núcleo</div>
           <div class="field"> 
-            <?php
-              
-              $db = new db();
-              
-              $list = $db->select('lr_nucleo');
-             
-              //print_r('$list: '.$list);
-              
-              print ComboBox('id_nucleo', $list, $id_nucleo);
-            ?>
+					<?php
+            $db = new db();
+            $list = $db->select('lr_nucleo');
+            print ComboBox('id_nucleo', $list, $id_nucleo);
+          ?>
           </div>
   </div>
   
   <div class="field odd">
-  <div class="label">Cnpj</div>
+  <div class="label">CNPJ</div>
   <div class="field"><input type="text" id="cnpj" name="cnpj" value="<?php print $cnpj; ?>" /></div>
   </div>
   
@@ -204,10 +218,10 @@ if (!$st) {
   </form>
 </div>
 <?php 
-} elseif ($_REQUEST['edit']) {
+} elseif (isset($_POST['edit'])) {
 	
-} elseif ($_REQUEST['del']) {
-	$id = $_REQUEST['del'];
+} elseif (isset($_POST['del'])) {
+	$id = $_POST['del'];
 	?>
 	<h3>Tem certeza que deseja excluir este registro?</h3>
 	<div class="del-button"><form method="post" action="index.php">
@@ -222,8 +236,8 @@ if (!$st) {
 	<?php
 
 } else {
-	if ($_REQUEST['delcfm']) {
-		$id = $_REQUEST['delcfm'];
+	if (isset($_POST['delcfm'])) {
+		$id = $_POST['delcfm'];
 	  $db = new db();
 		if ($db->delete($table, "$id_col = $id")) {
 			print '<div class="msg success"><span class="icon"></span>O registro foi excluído com sucesso.</div>';
@@ -246,7 +260,7 @@ if (!$st) {
 <table id="table" class="<?php print $view; ?>">
   <thead>
     <tr><?php
-    $cabecalho = array("Nome Empresa", "Cnpj", "Endereço",  "Bairro", "Responsável", "Tel. Resp.", "Email", "Núcleo");
+    $cabecalho = array("Nome Empresa", "CNPJ", "Endereço",  "Bairro", "Responsável", "Tel. Resp.", "Email", "Núcleo");
     foreach ($cabecalho as $k => $v) {
 			print "<th class=". $v .">$v</th>";
 		} ?>
@@ -257,6 +271,7 @@ if (!$st) {
   <tbody>
 <?php
 	$list = $db->select($view);
+
 	for ($i = 0; $i < count($list); $i++) {
 		if ($i % 2 == 0) { $class = 'even'; } else { $class = 'odd'; }
 		print '<tr class="'. $class .'">';

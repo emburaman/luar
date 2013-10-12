@@ -9,50 +9,73 @@ $id_col_user = 'username';
 
 /* Check id form should be displayed or not */
 $st = true;
-if ($_REQUEST['add'] || $_REQUEST['edit']) {
+if (isset($_POST['add']) || isset($_POST['edit'])) {
 	$st = false;
 }
-if ($_REQUEST['del']) {
+if (isset($_POST['del'])) {
 	$st = true;
 }
-if ($_REQUEST['edit']) {
+if (isset($_POST['edit'])) {
 	$st = false;
 }
 
 /* Starting DB */
 $db = new db();
 
-if($_REQUEST['edit']) {
-	$list = $db->select($table,'*', "$id_col = ". $_REQUEST['edit']);
+if (isset($_POST['edit'])) {
+	$list = $db->select($table,'*', "$id_col = ". $_POST['edit']);
 	foreach ($list[0] as $k => $v) {
 		${$k} = $v;
 	}
 }
 
+/* Declaring form variables */
+$id_voluntario = '';
+$id_tipo_voluntario = '';
+$id_status = '';
+$nome = '';
+$cpf = '';
+$rg = '';
+$dt_nascimento = '';
+$endereco = '';
+$bairro = '';
+$cidade = '';
+$estado = '';
+$cep = '';
+$telefone = '';
+$profissao = '';
+$email  = '';
+$id_entidade = '';
+$id_nucleo = '';
+
+$username = '';
+$password = '';
+$confirmp = '';
+
 /* Check if form was posted and if so, add record into DB */
-if ($_REQUEST['form']) {
+if (isset($_POST['form'])) {
 	/* Field mapping from form into DB table */
-	$id_voluntario = $_REQUEST['id_voluntario'];
-	$id_tipo_voluntario = $_REQUEST['id_tipo_voluntario'];
-	$id_status = $_REQUEST['id_status'];
-	$nome = $_REQUEST['nome'];
-	$cpf = $_REQUEST['cpf'];
-	$rg = $_REQUEST['rg'];
-	$dt_nascimento = $_REQUEST['dt_nascimento'];
-	$endereco = $_REQUEST['endereco'];
-	$bairro = $_REQUEST['bairro'];
-	$cidade = $_REQUEST['cidade'];
-	$estado = $_REQUEST['estado'];
-	$cep = $_REQUEST['cep'];
-	$telefone = $_REQUEST['telefone'];
-	$profissao = $_REQUEST['profissao'];
-	$email  = $_REQUEST['email'];
-	$id_entidade = $_REQUEST['id_entidade'];
-  $id_nucleo = $_REQUEST['id_nucleo'];
+	$id_voluntario = $_POST['id_voluntario'];
+	$id_tipo_voluntario = $_POST['id_tipo_voluntario'];
+	$id_status = $_POST['id_status'];
+	$nome = $_POST['nome'];
+	$cpf = $_POST['cpf'];
+	$rg = $_POST['rg'];
+	$dt_nascimento = $_POST['dt_nascimento'];
+	$endereco = $_POST['endereco'];
+	$bairro = $_POST['bairro'];
+	$cidade = $_POST['cidade'];
+	$estado = $_POST['estado'];
+	$cep = $_POST['cep'];
+	$telefone = $_POST['telefone'];
+	$profissao = $_POST['profissao'];
+	$email  = $_POST['email'];
+	$id_entidade = $_POST['id_entidade'];
+  $id_nucleo = $_POST['id_nucleo'];
 	
-  $username = $_REQUEST['username'];
-	$password = $_REQUEST['senha'];
-	$confirmp = $_REQUEST['cfsenha'];
+  $username = $_POST['username'];
+	$password = $_POST['senha'];
+	$confirmp = $_POST['cfsenha'];
 
 	if (($username != '' && $password == '') || ($username == '' && $password != '')) {
 		print '<div class="msg fail"><span class="icon"></span>Você está tentando criar um usuário para este voluntário? Parece que você não digitou os dados corretamente.</div>';
@@ -97,10 +120,10 @@ if ($_REQUEST['form']) {
                 'username' => $username
 							 );
 
-	if ($_REQUEST['enviar'] == 'edit_save' && $st != false) {
-		$where = "$id_col = ". $_REQUEST[$id_col];
+	if ($_POST['enviar'] == 'edit_save' && $st != false) {
+		$where = "$id_col = ". $_POST[$id_col];
 		if ($username != '' && $password != '') {
-		  $where_user = "$id_col_user = '". $_REQUEST[$id_col_user] ."'";
+		  $where_user = "$id_col_user = '". $_POST[$id_col_user] ."'";
 		}
 
 		if ($db->update($table, $cols, $where)) {
@@ -117,7 +140,7 @@ if ($_REQUEST['form']) {
 			$st = false;
 			print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
 		}
-	} elseif ($_REQUEST['enviar'] == 'save' && $st != false) {
+	} elseif ($_POST['enviar'] == 'save' && $st != false) {
 		/* Savind new record into DB */
 		if ($db->insert($table, $cols)) {
 			$st = true;
@@ -147,9 +170,9 @@ if ($_REQUEST['form']) {
   include_once('combobox.php');
     
 if (!$st) {
-  if ($_REQUEST['add']) {
+  if (isset($_POST['add'])) {
 		$btnval = 'save';
-	} elseif ($_REQUEST['edit']) {
+	} elseif (isset($_POST['edit'])) {
 		$btnval = 'edit_save';
 	}
 ?>
@@ -267,7 +290,7 @@ if (!$st) {
     <div class="field"><input type="email" id="email" name="email" value="<?php print $email; ?>" /></div>
   </div>
 
-  <fieldset>
+  <fieldset class="userdata">
   <div class="field odd first">
     <div class="label">Usuário</div>
     <div class="field"><input type="text" id="username" name="username" value="<?php print $username; ?>" /></div>
@@ -290,10 +313,10 @@ if (!$st) {
   </form>
 </div>
 <?php
-} elseif ($_REQUEST['edit']) {
+} elseif (isset($_POST['edit'])) {
 
-} elseif ($_REQUEST['del']) {
-	$id = $_REQUEST['del'];
+} elseif (isset($_POST['del'])) {
+	$id = $_POST['del'];
 	?>
 	<h3>Tem certeza que deseja excluir este registro?</h3>
 	<div class="del-button"><form method="post" action="index.php">
@@ -308,8 +331,8 @@ if (!$st) {
 	<?php
 
 } else {
-	if ($_REQUEST['delcfm']) {
-		$id = $_REQUEST['delcfm'];
+	if (isset($_POST['delcfm'])) {
+		$id = $_POST['delcfm'];
 	  $db = new db();
 		if ($db->delete($table, "$id_col = $id")) {
 			print '<div class="msg success"><span class="icon"></span>O registro foi excluído com sucesso.</div>';

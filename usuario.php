@@ -8,33 +8,33 @@ $id_col = 'username';
 
 /* Check id form should be displayed or not */
 $st = true;
-if ($_REQUEST['add'] || $_REQUEST['edit']) {
+if (isset($_POST['add']) || isset($_POST['edit'])) {
 	$st = false;
 }
-if ($_REQUEST['del']) {
+if (isset($_POST['del'])) {
 	$st = true;
 }
-if ($_REQUEST['edit']) {
+if (isset($_POST['edit'])) {
 	$st = false;
 }
 
 /* Starting DB */
 $db = new db();
 
-if($_REQUEST['edit']) {
-	$list = $db->select($table,'*', "$id_col = '". $_REQUEST['edit'] ."'");
+if (isset($_POST['edit'])) {
+	$list = $db->select($table,'*', "$id_col = '". $_POST['edit'] ."'");
 	foreach ($list[0] as $k => $v) {
 		${$k} = $v;
 	}
 }
 
 /* Check if form was posted and if so, add record into DB */
-if ($_REQUEST['form']) {
+if (isset($_POST['form'])) {
   /* Field mapping from form into DB table */
-	$id_col   = $_REQUEST[$id_col];
-  $username = $_REQUEST['username'];
-	$password = $_REQUEST['senha'];
-	$confirmp = $_REQUEST['cfsenha'];
+	$id_col   = $_POST[$id_col];
+  $username = $_POST['username'];
+	$password = $_POST['senha'];
+	$confirmp = $_POST['cfsenha'];
 
   include_once 'class.user.php';
   $usr = new User();
@@ -51,7 +51,7 @@ if ($_REQUEST['form']) {
 	/* Preparing array of values to be saved into DB */
 	$cols = array('username' => "$username", 'senha' => "$password");
 
-	if ($_REQUEST['enviar'] == 'edit_save' && $st == true) {
+	if ($_POST['enviar'] == 'edit_save' && $st == true) {
 		$where = "$id_col = $id_col";
     
 		if ($db->update($table, $cols, $where)) {
@@ -61,7 +61,7 @@ if ($_REQUEST['form']) {
 			$st = false;
 			print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
 		}
-	} elseif ($_REQUEST['enviar'] == 'save' && $st == true) {
+	} elseif ($_POST['enviar'] == 'save' && $st == true) {
 		/* Savind new record into DB */
 		if ($db->insert($table, $cols)) {
 			$st = true;
@@ -75,9 +75,9 @@ if ($_REQUEST['form']) {
 
 /* Start HTML */
 if (!$st) { 
-  if ($_REQUEST['add']) {
+  if (isset($_POST['add'])) {
 		$btnval = 'save';
-	} elseif ($_REQUEST['edit']) {
+	} elseif (isset($_POST['edit'])) {
 		$btnval = 'edit_save';
 	}
 ?>
@@ -104,10 +104,10 @@ if (!$st) {
   </form>
 </div>
 <?php 
-} elseif ($_REQUEST['edit']) {
+} elseif (isset($_POST['edit'])) {
 	
-} elseif ($_REQUEST['del']) {
-	$id = $_REQUEST['del'];
+} elseif (isset($_POST['del'])) {
+	$id = $_POST['del'];
 	?>
 	<h3>Tem certeza que deseja excluir este registro?</h3>
 	<div class="del-button"><form method="post" action="index.php">
@@ -122,8 +122,8 @@ if (!$st) {
 	<?php
 
 } else {
-	if ($_REQUEST['delcfm']) {
-		$id = $_REQUEST['delcfm'];
+	if (isset($_POST['delcfm'])) {
+		$id = $_POST['delcfm'];
 	  $db = new db();
 		if ($db->delete($table, "$id_col = '$id'")) {
 			print '<div class="msg success"><span class="icon"></span>O registro foi excluído com sucesso.</div>';
