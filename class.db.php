@@ -18,7 +18,7 @@ class db {
     if ($order != null) {
       $sql .= " ORDER BY $order";
     }
-		
+
     $qry = $this->conn->prepare($sql);
 		if ($qry->execute()) {
 			$result = $qry->fetchAll(PDO::FETCH_ASSOC);
@@ -61,7 +61,6 @@ class db {
 		}
 		
     $sql = "INSERT INTO $table ($col) VALUE ($val)";
-
     $qry = $this->conn->prepare($sql);
 		if ($qry->execute()) {
 		  return true;
@@ -84,6 +83,7 @@ class db {
 		}
 		
 		$sql = "UPDATE $table SET $val WHERE $where";
+
     $qry = $this->conn->prepare($sql);
 		if ($qry->execute()) {
 		  return true;

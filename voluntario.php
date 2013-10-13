@@ -7,6 +7,16 @@ $frm    = 'frm_voluntario';
 $id_col = 'id_voluntario';
 $id_col_user = 'username';
 
+include_once "class.user.php";
+
+/* Load this screen's permissions for current user */
+if (isset($_SESSION['user']['permissions'][$frm])) {
+	$access = $_SESSION['user']['permissions'][$frm];
+} else {
+	print '<div class="msg fail"><span class="icon"></span>Acesso restrito. Consulte um administrador para solicitar permissão para visualizar esta página.</div>';
+	die;
+}
+
 /* Check id form should be displayed or not */
 $st = true;
 if (isset($_POST['add']) || isset($_POST['edit'])) {
@@ -17,16 +27,6 @@ if (isset($_POST['del'])) {
 }
 if (isset($_POST['edit'])) {
 	$st = false;
-}
-
-/* Starting DB */
-$db = new db();
-
-if (isset($_POST['edit'])) {
-	$list = $db->select($table,'*', "$id_col = ". $_POST['edit']);
-	foreach ($list[0] as $k => $v) {
-		${$k} = $v;
-	}
 }
 
 /* Declaring form variables */
@@ -52,6 +52,16 @@ $username = '';
 $password = '';
 $confirmp = '';
 
+/* Starting DB */
+$db = new db();
+
+if (isset($_POST['edit'])) {
+	$list = $db->select($table,'*', "$id_col = ". $_POST['edit']);
+	foreach ($list[0] as $k => $v) {
+		${$k} = $v;
+	}
+}
+
 /* Check if form was posted and if so, add record into DB */
 if (isset($_POST['form'])) {
 	/* Field mapping from form into DB table */
@@ -73,16 +83,22 @@ if (isset($_POST['form'])) {
 	$id_entidade = $_POST['id_entidade'];
   $id_nucleo = $_POST['id_nucleo'];
 	
-  $username = $_POST['username'];
-	$password = $_POST['senha'];
-	$confirmp = $_POST['cfsenha'];
+	if (isset($_POST['username'])) {
+  	$username = $_POST['username'];
+	}
+	if (isset($_POST['senha'])) {
+		$password = $_POST['senha'];
+	}
+	if (isset($_POST['cfsenha'])) {
+		$confirmp = $_POST['cfsenha'];
+	}
 
-	if (($username != '' && $password == '') || ($username == '' && $password != '')) {
+	if ($_POST['enviar'] == 'save' && (($username != '' && $password == '') || ($username == '' && $password != ''))) {
 		print '<div class="msg fail"><span class="icon"></span>Você está tentando criar um usuário para este voluntário? Parece que você não digitou os dados corretamente.</div>';
 		$st = false;
 	}
+
 	if ($username != '' && $password != '') {
-		include_once "class.user.php";
 		$usr = new User();
 		$cols_user = array();
 		
@@ -120,36 +136,70 @@ if (isset($_POST['form'])) {
                 'username' => $username
 							 );
 
+	/* Check if volunteer type has changed */
+	$usr = new User();
+	$vo = $usr->getUserProfile($username);
+	$old_id_vol = $id_tipo_voluntario;
+	if (count($vo) > 0) {
+		$old_id_vol = $vo[0]['id_tipo_voluntario'];
+	}
+
 	if ($_POST['enviar'] == 'edit_save' && $st != false) {
 		$where = "$id_col = ". $_POST[$id_col];
 		if ($username != '' && $password != '') {
 		  $where_user = "$id_col_user = '". $_POST[$id_col_user] ."'";
 		}
+		
+		/* UPDATE VONLUNTARIO */
 
 		if ($db->update($table, $cols, $where)) {
 			$st = true;
 			print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
+			
+			/* Create user to the edited volunteer */
 			if ($username != '' && $password != '') {
-				if ($db->update($table_user, $cols_user, $where_user)) {
+				if ($db->insert($table_user, $cols_user)) {
 					print '<div class="msg success"><span class="icon"></span>O usuário deste voluntário foi salvo com sucesso.</div>';
 				} else {
 					print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o usuário deste voluntário.</div>';
+				}
+			}
+			/* Check if volunteer type has changed */
+			if ($old_id_vol <> $id_tipo_voluntario) {
+				$db->delete('lr_rel_acesso_usuario', "username = '$username'");
+
+				/* Get screen's ID and allowed volunteer types and access levels from DB */
+				if ($usr->updateUserPermission($username, $id_tipo_voluntario)) {
+					print '<div class="msg success"><span class="icon"></span>As permissões de acesso deste voluntário foram salvas com sucesso.</div>';
+				} else {
+					print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar as permmissões do usuário deste voluntário.</div>';
 				}
 			}
 		} else {
 			$st = false;
 			print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
 		}
+		
+	/* INSERT VOLUNTARIO */
+
 	} elseif ($_POST['enviar'] == 'save' && $st != false) {
-		/* Savind new record into DB */
+
+		/* Saving new record into DB */
 		if ($db->insert($table, $cols)) {
 			$st = true;
 			print '<div class="msg success"><span class="icon"></span>O registro foi salvo com sucesso.</div>';
 			if ($username != '' && $password != '') {
-				if ($db->insert($table_user, $cols_user, $where_user)) {
+				if ($db->insert($table_user, $cols_user)) {
 					print '<div class="msg success"><span class="icon"></span>O usuário deste voluntário foi salvo com sucesso.</div>';
 				} else {
 					print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o usuário deste voluntário.</div>';
+				}
+				
+				/* Get screen's ID and allowed volunteer types and access levels from DB */
+				if ($usr->updateUserPermission($username, $id_tipo_voluntario)) {
+					print '<div class="msg success"><span class="icon"></span>As permissões de acesso deste voluntário foram salvas com sucesso.</div>';
+				} else {
+					print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar as permmissões do usuário deste voluntário.</div>';
 				}
 			}
 		} else {
@@ -196,7 +246,7 @@ if (!$st) {
         <div class="field"> 
           <?php
             $db = new db();
-            $list = $db->select('lr_tipo_voluntario');
+            $list = $db->select('lr_tipo_voluntario', '*', 'id_tipo_voluntario > '. $_SESSION['user']['id_profile']);
             print ComboBox('id_tipo_voluntario', $list, $id_tipo_voluntario);
           ?>
         </div>
@@ -294,16 +344,24 @@ if (!$st) {
   <p>Se você deseja criar um usuário para este voluntário, preencha os campos abaixo.</p>
   <div class="field odd first">
     <div class="label">Usuário</div>
-    <div class="field"><input type="text" id="username" name="username" value="<?php print $username; ?>" /></div>
+    <?php 
+		$dis = ''; 
+		if (isset($_POST['edit']) && $username != '') {
+			print '<input type="hidden" id="username" name="username" value="'. $username .'" />';
+			$dis = 'disabled="disabled"';
+		} ?>
+    <div class="field"><input type="text" id="username" name="username" value="<?php print $username; ?>" <?php print $dis; ?> /></div>
   </div>
+  <?php if (isset($_POST['add']) || ($username == '' && $password == '')) { ?>
   <div class="field even">
     <div class="label">Senha</div>
-    <div class="field"><input type="password" id="senha" name="senha" value="<?php //print $senha; ?>" /></div>
+    <div class="field"><input type="password" id="senha" name="senha" value="" /></div>
   </div>
   <div class="field odd last">
     <div class="label">Confirme a Senha</div>
-    <div class="field"><input type="password" id="cfsenha" name="cfsenha" value="<?php //print $senha; ?>" /></div>
+    <div class="field"><input type="password" id="cfsenha" name="cfsenha" value="" /></div>
   </div>
+  <?php } ?>
   </fieldset>
 
 
@@ -342,11 +400,13 @@ if (!$st) {
 		}
 	}
 ?>
-<div class="add-button"><form method="post" action="index.php">
-  <input type="hidden" id="p" name="p" value="<?php print $frm; ?>" />
-  <input type="hidden" id="add" name="add" value="novo" />
-  <button type="submit" id="novo" name="novo"><span class="icon"></span>Novo</button>
-</form></div>
+<?php if ($access == 'T') { ?>
+  <div class="add-button"><form method="post" action="index.php">
+    <input type="hidden" id="p" name="p" value="<?php print $frm; ?>" />
+    <input type="hidden" id="add" name="add" value="novo" />
+    <button type="submit" id="novo" name="novo"><span class="icon"></span>Novo</button>
+  </form></div>
+<?php } ?>
 
 <?php
 	/* List records */
@@ -360,8 +420,10 @@ if (!$st) {
 		foreach ($cabecalho as $k => $v) {
 			print "<th class=". $v .">$v</th>";
 		} ?>
-    <td width="1"><!-- Action column --></td>
-    <td width="1"><!-- Action column --></td>
+    <?php if ($access == 'T') { ?>
+      <td width="1"><!-- Action column --></td>
+      <td width="1"><!-- Action column --></td>
+    <?php } ?>
 		</tr>
 	</thead>
   <tbody>
@@ -374,11 +436,13 @@ if (!$st) {
 			if ($k == $id_col) { $id = $v; }
 			print "<td class=". $k .">$v</td>";
 		}
-		print '<form method="post" action="index.php">
-					<input type="hidden" id="p" name="p" value="'. $frm .'" />
-					<td><button class="edit" type="submit" id="edit" name="edit" value="'. $id .'">Y</button></td>
-					<td><button class="del" type="submit" id="del" name="del" value="'. $id .'">X</button></td>
-					</form>';
+		if ($access == 'T') {
+			print '<form method="post" action="index.php">
+						<input type="hidden" id="p" name="p" value="'. $frm .'" />
+						<td><button class="edit" type="submit" id="edit" name="edit" value="'. $id .'">Y</button></td>
+						<td><button class="del" type="submit" id="del" name="del" value="'. $id .'">X</button></td>
+						</form>';
+		}
 		print '</tr>';
 		$id = '';
 	}

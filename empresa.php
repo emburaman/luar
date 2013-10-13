@@ -4,6 +4,15 @@ $table = 'lr_empresa';
 $view   = 'vlr_empresa';
 $frm = 'frm_empresa';
 $id_col = 'id_empresa';
+$access = '';
+
+/* Load this screen's permissions for current user */
+if (isset($_SESSION['user']['permissions'][$frm])) {
+	$access = $_SESSION['user']['permissions'][$frm];
+} else {
+	print '<div class="msg fail"><span class="icon"></span>Acesso restrito. Consulte um administrador para solicitar permissão para visualizar esta página.</div>';
+	die;
+}
 
 /* Check id form should be displayed or not */
 $st = true;
@@ -15,16 +24,6 @@ if (isset($_POST['del'])) {
 }
 if (isset($_POST['edit'])) {
 	$st = false;
-}
-
-/* Starting DB */
-$db = new db();
-
-if(isset($_POST['edit'])) {
-	$list = $db->select($table,'*', "$id_col = ". $_POST['edit']);
-	foreach ($list[0] as $k => $v) {
-		$$k = $v;
-	}
 }
 
 /* Declaring the form variables */
@@ -45,6 +44,16 @@ $email_responsavel = '';
 $id_nucleo = '';
 $id_voluntario_captador = '';
 $observacao = '';
+
+/* Starting DB */
+$db = new db();
+
+if(isset($_POST['edit'])) {
+	$list = $db->select($table,'*', "$id_col = ". $_POST['edit']);
+	foreach ($list[0] as $k => $v) {
+		$$k = $v;
+	}
+}
 
 /* Check if form was posted and if so, add record into DB */
 if (isset($_POST['form'])) {
@@ -246,11 +255,13 @@ if (!$st) {
 		}
 	}
 ?>
-<div class="add-button"><form method="post" action="index.php">
-  <input type="hidden" id="p" name="p" value="<?php print $frm; ?>" />
-  <input type="hidden" id="add" name="add" value="novo" />
-  <button type="submit" id="novo" name="novo"><span class="icon"></span>Novo</button>
-</form></div>
+<?php if ($access == 'T') { ?>
+  <div class="add-button"><form method="post" action="index.php">
+    <input type="hidden" id="p" name="p" value="<?php print $frm; ?>" />
+    <input type="hidden" id="add" name="add" value="novo" />
+    <button type="submit" id="novo" name="novo"><span class="icon"></span>Novo</button>
+  </form></div>
+<?php } ?>
 
 <?php
 	/* List records */
@@ -264,8 +275,10 @@ if (!$st) {
     foreach ($cabecalho as $k => $v) {
 			print "<th class=". $v .">$v</th>";
 		} ?>
-    <td width="1"><!-- Action column --></td>
-    <td width="1"><!-- Action column --></td>
+    <?php if ($access == 'T') { ?>
+      <td width="1"><!-- Action column --></td>
+      <td width="1"><!-- Action column --></td>
+    <?php } ?>
 		</tr>
 	</thead>
   <tbody>
@@ -283,11 +296,13 @@ if (!$st) {
 		$id = $db->select($table, 'id_empresa', "cnpj = ". $list[$i]['cnpj']);
 		$id = $id[0]['id_empresa'];
 		
-		print '<form method="post" action="index.php">
-					<input type="hidden" id="p" name="p" value="'. $frm .'" />
-					<td><button class="edit" type="submit" id="edit" name="edit" value="'. $id .'">Y</button></td>
-					<td><button class="del" type="submit" id="del" name="del" value="'. $id .'">X</button></td>
-					</form>';
+		if ($access == 'T') {
+			print '<form method="post" action="index.php">
+						<input type="hidden" id="p" name="p" value="'. $frm .'" />
+						<td><button class="edit" type="submit" id="edit" name="edit" value="'. $id .'">Y</button></td>
+						<td><button class="del" type="submit" id="del" name="del" value="'. $id .'">X</button></td>
+						</form>';
+		}
 		print '</tr>';
 		$id = '';
 	}

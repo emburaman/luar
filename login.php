@@ -26,10 +26,18 @@ switch ($action) {
 		} else {
 			$user = new User();
 			$password = sha1($password);
-			$user = $user->login($username, $password);
+			$login = $user->login($username, $password);
 			
-			if ($user == TRUE) {
+			if ($login == TRUE) {
 				$_SESSION['user']['username'] = $username;
+				$permissions = $user->getUserPermissions($username);
+				for ($i = 0; $i < count($permissions); $i++) { 
+					$nome_tela = strtolower($permissions[$i]['nome_tela']);
+					$nivel_acesso = $permissions[$i]['cod_nivel_acesso'];
+					$_SESSION['user']['permissions'][$nome_tela] = $nivel_acesso;
+				}
+				$profile = $user->getUserProfile($username);
+				$_SESSION['user']['id_profile'] = $profile[0]['id_tipo_voluntario'];
 				$action = 2;
 			} else {
 				$error .= '<p>Usuário não existe ou senha inválida, por favor tente novamente.</p>';

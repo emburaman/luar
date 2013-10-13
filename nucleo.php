@@ -1,10 +1,16 @@
-<h1>Cadastro de Nucleos</h1>
-
 <?php
 /* Define what DB table and form will be used in this form */
 $table = 'lr_nucleo';
 $frm = 'frm_nucleo';
 $id_col = 'id_nucleo';
+
+/* Load this screen's permissions for current user */
+if (isset($_SESSION['user']['permissions'][$frm])) {
+	$access = $_SESSION['user']['permissions'][$frm];
+} else {
+	print '<div class="msg fail"><span class="icon"></span>Acesso restrito. Consulte um administrador para solicitar permissão para visualizar esta página.</div>';
+	die;
+}
 
 /* Check id form should be displayed or not */
 $st = true;
@@ -58,7 +64,9 @@ if (isset($_POST['form'])) {
 	}
 }
 
-/* Start HTML */
+/* Start HTML */ ?>
+<h1>Cadastro de Nucleos</h1>
+<?php
 if (!$st) { 
   if (isset($_POST['add'])) {
 		$btnval = 'save';
@@ -110,11 +118,13 @@ if (!$st) {
 		}
 	}
 ?>
-<div class="add-button"><form method="post" action="index.php">
-  <input type="hidden" id="p" name="p" value="<?php print $frm; ?>" />
-  <input type="hidden" id="add" name="add" value="novo" />
-  <button type="submit" id="novo" name="novo"><span class="icon"></span>Novo</button>
-</form></div>
+<?php if ($access == 'T') { ?>
+  <div class="add-button"><form method="post" action="index.php">
+    <input type="hidden" id="p" name="p" value="<?php print $frm; ?>" />
+    <input type="hidden" id="add" name="add" value="novo" />
+    <button type="submit" id="novo" name="novo"><span class="icon"></span>Novo</button>
+  </form></div>
+<?php } ?>
 
 <?php
 	/* List records */
@@ -128,8 +138,10 @@ if (!$st) {
 		foreach ($cabecalho as $k => $v) {
 			print "<th class=". $v .">$v</th>";
 		} ?>
-    <td width="1"><!-- Action column --></td>
-    <td width="1"><!-- Action column --></td>
+    <?php if ($access == 'T') { ?>
+      <td width="1"><!-- Action column --></td>
+      <td width="1"><!-- Action column --></td>
+    <?php } ?>
 		</tr>
 	</thead>
   <tbody>
@@ -142,11 +154,13 @@ if (!$st) {
 			if ($k == $id_col) { $id = $v; }
 			print "<td class=". $k .">$v</td>";
 		}
-		print '<form method="post" action="index.php">
-					<input type="hidden" id="p" name="p" value="'. $frm .'" />
-					<td><button class="edit" type="submit" id="edit" name="edit" value="'. $id .'">Y</button></td>
-					<td><button class="del" type="submit" id="del" name="del" value="'. $id .'">X</button></td>
-					</form>';
+		if ($access == 'T') {
+			print '<form method="post" action="index.php">
+						<input type="hidden" id="p" name="p" value="'. $frm .'" />
+						<td><button class="edit" type="submit" id="edit" name="edit" value="'. $id .'">Y</button></td>
+						<td><button class="del" type="submit" id="del" name="del" value="'. $id .'">X</button></td>
+						</form>';
+		}
 		print '</tr>';
 		$id = '';
 	}
