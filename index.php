@@ -1,15 +1,9 @@
+<?php include_once('header.php'); ?>
 <?php
-/* Variables declaration */
-$add = '';
-$del = '';
-$edit = '';
-
 $screen = '';
-if (isset($_REQUEST['p'])) { $screen = $_REQUEST['p']; }
+if ($_REQUEST['p']) { $screen = $_REQUEST['p']; }
 
-include_once('header.php');
-
-if (isset($_SESSION['user'])) {
+if ($_SESSION['user']) {
 	switch ($screen) {
 		case 'frm_empresa':
 			include_once('empresa.php');
@@ -27,12 +21,16 @@ if (isset($_SESSION['user'])) {
 			include_once('nucleo.php');
 			break;
 
+		case 'frm_importacao':
+			include_once('importacao.php');
+			break;
+
 		default:
 			print 'Home';
 			break;
 	}
 } 
-if (!isset($_SESSION['user']) && isset($_REQUEST['p'])) {
+if (!$_SESSION['user'] && $_REQUEST['p']) {
 	print '<div class="msg fail"><span class="icon"></span>Você precisa estar logado para visualizar esta página.</div>';
 }
 ?>

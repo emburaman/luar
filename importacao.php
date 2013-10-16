@@ -5,6 +5,7 @@ $EXTENSAO_VALIDA = 'csv';
 
 if (isset($_FILES['arquivo'])) {
 	$filename = $_FILES['arquivo']['tmp_name'];
+  $lines = count(file($filename));
 
 	/*valores constantes, posições das colunas*/
 	$CONS_NUM_NOTA = 0; #Número da Nota;
@@ -16,7 +17,7 @@ if (isset($_FILES['arquivo'])) {
 	$CONS_STATUS_PEDIDO = 6; #Status do Pedido;
 	$CONS_TIPO_PEDIDO = 7; #Tipo do Pedido;
 	$CONS_CNPJ_ESTABELECIMENTO = 8; #CNPJ Estabelecimento;
-	$CONS_RAZAO_SOCIAL_ESTABELECIMENTO = 9; #Razão Social Estabelecimento
+	$CONS_RAZAO_SOCIAL_ESTABELECIMENTO = 9; #Razão Social Estabelecimento;
 	
 	function onlyNumbers($oldValue) {
 		return preg_replace("/[^0-9]/", "", $oldValue);
@@ -26,35 +27,36 @@ if (isset($_FILES['arquivo'])) {
 		return str_replace(',', '.', str_replace('.', '', preg_replace("/[^0-9,.]/", "", $oldValue)));
 	}
 
-	//abrir arquivo em modo leitura
-	if ($file_handle = fopen($filename, "r")) {
-		$count = 0;
-		
-		//loop na leitura
-		while (!feof($file_handle)) {
-		   $line = fgets($file_handle);
-		   $arr = explode(";", $line);
-		   
-		   if ($count > 0 && is_numeric($arr[$CONS_NUM_NOTA])) { //ignorar a primeira coluna e quaisquer outra que a primeira coluna não seja numérica (última linha)
-		   	    $num_nota = $arr[$CONS_NUM_NOTA];
-		   	    $valor_nota = onlyNumbersMonetary($arr[$CONS_VALOR_NOTA]);
-				$data_nota = $arr[$CONS_DATA_NOTA];
-				$cnpj_ent_social = onlyNumbers($arr[$CONS_CNPJ_ENT_SOCIAL]);
-				$cpf_doador_cadastrador = onlyNumbers($arr[$CONS_CPF_DOADOR_CADASTRADOR]);
-				$data_pedido = $arr[$CONS_DATA_PEDIDO];
-				$status_pedido = $arr[$CONS_STATUS_PEDIDO];
-				$tipo_pedido = $arr[$CONS_TIPO_PEDIDO];
-				$cnpj_estabelecimento = onlyNumbers($arr[$CONS_CNPJ_ESTABELECIMENTO]);
-				$razao_social_estabelecimento = $arr[$CONS_RAZAO_SOCIAL_ESTABELECIMENTO];
+	/* abrir arquivo em modo leitura */
+  $file_handle = fopen($filename, "r");
+  $count = 0;
 
-				
-		   }
-		   
-		   $count++;
-		}
+  while (!feof($file_handle)) {
+     $line = fgets($file_handle);
+     $arr[$count] = explode(";", $line);
+     $count++;
+  }
+  fclose($file_handle);
 
-		fclose($file_handle);
-	}
+  foreach ($arr as $item) {
+    if (count($item) > 1 && is_numeric($item[$CONS_NUM_NOTA])) {
+      $num_nota = $arr[$CONS_NUM_NOTA];
+      $valor_nota = onlyNumbersMonetary($arr[$CONS_VALOR_NOTA]);
+      $data_nota = $arr[$CONS_DATA_NOTA];
+      $cnpj_ent_social = onlyNumbers($arr[$CONS_CNPJ_ENT_SOCIAL]);
+      $cpf_doador_cadastrador = onlyNumbers($arr[$CONS_CPF_DOADOR_CADASTRADOR]);
+      $data_pedido = $arr[$CONS_DATA_PEDIDO];
+      $status_pedido = $arr[$CONS_STATUS_PEDIDO];
+      $tipo_pedido = $arr[$CONS_TIPO_PEDIDO];
+      $cnpj_estabelecimento = onlyNumbers($arr[$CONS_CNPJ_ESTABELECIMENTO]);
+      $razao_social_estabelecimento = $arr[$CONS_RAZAO_SOCIAL_ESTABELECIMENTO];
+    }
+  }
+
+print '<pre>';
+//print_r ($arr);
+print $i .'</pre>';
+die;
 }
 ?>
 

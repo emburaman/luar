@@ -25,17 +25,17 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `lr_empresa`
 --
-
+DROP TABLE IF EXISTS `lr_empresa`;
 CREATE TABLE IF NOT EXISTS `lr_empresa` (
   `id_empresa` int(11) NOT NULL AUTO_INCREMENT,
   `razao_social` varchar(255) NOT NULL,
   `nome_fantasia` varchar(255) NOT NULL,
-  `cnpj` int(11) NOT NULL,
+  `cnpj` int(14) NOT NULL,
   `endereco` varchar(255) NULL,
   `bairro` varchar(255) NULL,
   `cidade` varchar(255) NULL,
   `estado` varchar(255) NULL,
-  `cep` int(11) NULL,
+  `cep` int(8) NULL,
   `telefone` int(11) NULL,
   `email` varchar(255) NULL,
   `nome_responsavel` varchar(255) NULL,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `lr_empresa` (
 --
 -- Table structure for table `lr_entidade`
 --
-
+DROP TABLE IF EXISTS `lr_entidade`;
 CREATE TABLE IF NOT EXISTS `lr_entidade` (
   `id_entidade` int(11) NOT NULL AUTO_INCREMENT,
   `descricao` varchar(255) CHARACTER SET latin1 NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `lr_entidade` (
 --
 -- Table structure for table `lr_nucleo`
 --
-
+DROP TABLE IF EXISTS `lr_nucleo`;
 CREATE TABLE IF NOT EXISTS `lr_nucleo` (
   `id_nucleo` int(11) NOT NULL AUTO_INCREMENT,
   `descricao` varchar(255) CHARACTER SET latin1 NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `lr_nucleo` (
 --
 -- Table structure for table `lr_rel_acesso_usuario_tela`
 --
-
+DROP TABLE IF EXISTS `lr_rel_acesso_usuario_tela`;
 CREATE TABLE IF NOT EXISTS `lr_rel_acesso_usuario_tela` (
   `username` varchar(255) NOT NULL,
   `id_tela` int(11) NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `lr_rel_acesso_usuario_tela` (
 --
 -- Table structure for table `lr_config_acesso_tipo_volunt`
 --
-
+DROP TABLE IF EXISTS       `lr_config_acesso_tipo_volunt`;
 CREATE TABLE IF NOT EXISTS `lr_config_acesso_tipo_volunt` (
   `id_tipo_voluntario` bigint(11) NOT NULL,
   `id_tela` int(11) NOT NULL,
@@ -103,27 +103,19 @@ CREATE TABLE IF NOT EXISTS `lr_config_acesso_tipo_volunt` (
 --
 -- Table structure for table `lr_status`
 --
-
+DROP TABLE IF EXISTS `lr_status`;
 CREATE TABLE IF NOT EXISTS `lr_status` (
   `id_status` int(11) NOT NULL AUTO_INCREMENT,
   `descricao` varchar(50) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id_status`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
---
--- Dumping data for table `lr_status`
---
-
-INSERT INTO `lr_status` (`id_status`, `descricao`) VALUES
-(1, 'ATIVO'),
-(2, 'INATIVO');
-
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `lr_tela`
 --
-
+DROP TABLE IF EXISTS `lr_tela`;
 CREATE TABLE IF NOT EXISTS `lr_tela` (
   `id_tela` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(255) CHARACTER SET latin1 NOT NULL,
@@ -135,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `lr_tela` (
 --
 -- Table structure for table `lr_tipo_voluntario`
 --
-
+DROP TABLE IF EXISTS `lr_tipo_voluntario`;
 CREATE TABLE IF NOT EXISTS `lr_tipo_voluntario` (
   `id_tipo_voluntario` int(11) NOT NULL AUTO_INCREMENT,
   `descricao` varchar(255) NOT NULL,
@@ -147,25 +139,27 @@ CREATE TABLE IF NOT EXISTS `lr_tipo_voluntario` (
 --
 -- Table structure for table `lr_usuario`
 --
-
+DROP TABLE IF EXISTS `lr_usuario`;
 CREATE TABLE IF NOT EXISTS `lr_usuario` (
   `username` varchar(255) NOT NULL,
   `senha` varchar(255) NOT NULL,
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+INSERT INTO `lr_usuario` (`username`,`senha`) VALUES ('emburaman', '71ba46ab6ae4dc109035996f618d74636b8cc38d');
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `lr_voluntario`
 --
-
+DROP TABLE IF EXISTS `lr_voluntario`;
 CREATE TABLE IF NOT EXISTS `lr_voluntario` (
   `id_voluntario` int(11) NOT NULL AUTO_INCREMENT,
   `id_tipo_voluntario` int(11) NOT NULL,
   `id_status` int(11) NOT NULL,
-  `nome` varchar(255) NOT NULL,
-  `cpf` int(11) NOT NULL,
+  `nome` varchar(255) NULL,
+  `cpf` bigint(11) not NULL,
   `rg` varchar(255) NULL,
   `dt_nascimento` date NULL,
   `endereco` varchar(255) NULL,
@@ -173,18 +167,14 @@ CREATE TABLE IF NOT EXISTS `lr_voluntario` (
   `cidade` varchar(255)  NULL,
   `estado` varchar(255)  NULL,
   `cep` int(11) NULL,
-  `telefone` int(11) NULL,
+  `telefone` bigint(11) NULL,
   `profissao` varchar(255) NULL,
   `email` varchar(255) NULL,
-  `id_entidade` int(11) NOT NULL,
-  `id_nucleo` int(11) NOT NULL,
-  `username` varchar(255) NOT NULL,
+  `id_entidade` int(11) NULL,
+  `id_nucleo` int(11) NULL,
+  `username` varchar(255) NULL,
   PRIMARY KEY (`id_voluntario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
---
--- Constraints for dumped tables
---
 
 --
 -- Constraints for table `lr_rel_acesso_usuario_tela`
@@ -203,25 +193,87 @@ ALTER TABLE `lr_voluntario`
   ADD CONSTRAINT `fk_vol_ent_3` FOREIGN KEY (`id_entidade`) REFERENCES `lr_entidade` (`id_entidade`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_vol_tp_vol_4` FOREIGN KEY (`id_tipo_voluntario`) REFERENCES `lr_tipo_voluntario` (`id_tipo_voluntario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-
 --
 -- Table structure for table `lr_importa_arquivo_nota`
 --
-
+drop table IF EXISTS `lr_importa_arquivo_nota`;
 CREATE TABLE IF NOT EXISTS `lr_importa_arquivo_nota` (
   `id_importa_arquivo_nota` int(11) NOT NULL AUTO_INCREMENT,
-  `id_voluntario` int(11) NULL,
+  `data_importacao` date null,
   `csv_numero_nota` int(11) NULL,
-  `csv_valor_nota` int(11) NULL,
+  `csv_valor_nota` float(8,2) NULL,
   `csv_data_nota` date NULL,
-  `csv_cnpj_entidade_social` int(11) NULL,
+  `csv_cnpj_entidade_social` int(14) NULL,
   `csv_cpf_cadastrador` int(11) NULL,
   `csv_data_pedido` date NULL,
   `csv_status_pedido` varchar(255) NULL,
   `csv_tipo_pedido` varchar(255) NULL,
-  `csv_cnpj_estabelecimento` int(11) NULL,
+  `csv_cnpj_estabelecimento` int(14) NULL,
   `csv_razao_social_estab` varchar(255) NULL,
   PRIMARY KEY (`id_importa_arquivo_nota`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+--
+-- Table structure for table `lr_status_nota`
+--
+DROP TABLE IF EXISTS `lr_status_nota`;
+CREATE TABLE IF NOT EXISTS `lr_status_nota` (
+  `cod_status_nota` varchar(40) NOT NULL,
+  `descricao` varchar(255) NULL,
+  PRIMARY KEY (`cod_status_nota`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+--
+-- Table structure for table `lr_nota`
+--
+DROP TABLE IF EXISTS `lr_nota`;
+CREATE TABLE IF NOT EXISTS `lr_nota` (
+  `id_nota` int(11) NOT NULL AUTO_INCREMENT,
+  `numero_nota` int(11) NULL,
+  `id_empresa` int(11) NULL,
+  `id_voluntario_digitador` int(11) NULL,
+  `valor_nota` float(8,2) NULL,
+  `data_nota` date NULL,
+  `valor_credito` float(8,2) NULL,
+  `cod_status_nota` varchar(40) NULL,
+  PRIMARY KEY (`id_nota`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+ALTER TABLE `lr_nota`
+  ADD CONSTRAINT `fk_nota_emp_1` FOREIGN KEY (`id_empresa`) REFERENCES `lr_empresa` (`id_empresa`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_nota_vol_2` FOREIGN KEY (`id_voluntario_digitador`) REFERENCES `lr_voluntario` (`id_voluntario`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_nota_status_3` FOREIGN KEY (`cod_status_nota`) REFERENCES `lr_status_nota` (`cod_status_nota`) ON DELETE CASCADE ON UPDATE CASCADE;
+  
+
+--
+-- Table structure for table `lr_importa_arquivo_credito`
+--
+DROP TABLE IF EXISTS `lr_importa_arquivo_credito`;
+CREATE TABLE IF NOT EXISTS `lr_importa_arquivo_credito` (
+  `id_importa_arquivo_credito` int(11) NOT NULL AUTO_INCREMENT,
+  `data_importacao` date null,
+  `csv_cnpj_estabelecimento` int(14) NULL,
+  `csv_razao_social_estab` varchar(255) NULL,
+  `csv_numero_nota` int(11) NULL,
+  `csv_valor_nota` float(8,2) NULL,
+  `csv_data_emissao` date NULL,
+  `csv_data_registro` date NULL,
+  `csv_valor_credito` float(8,2) NULL,
+  `csv_situacao_credito` varchar(255) NULL,
+  `id_voluntario_digitador` int(11) NULL,
+  PRIMARY KEY (`id_importa_arquivo_credito`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+--
+-- Table structure for table `lr_rejeicao_importacao_credito`
+--
+DROP TABLE IF EXISTS `lr_rejeicao_importacao_credito`;
+CREATE TABLE IF NOT EXISTS `lr_rejeicao_importacao_credito` (
+  `id_rejeicao_importacao_credito` int(11) NOT NULL AUTO_INCREMENT,
+  `id_importa_arquivo_credito` int(11) NOT NULL,  
+  `descricao_motivo` varchar(255) NULL,
+  PRIMARY KEY (`id_rejeicao_importacao_credito`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
