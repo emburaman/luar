@@ -1,4 +1,18 @@
 <?php
+/* Define what DB table and form will be used in this form */
+$table = 'lr_nota';
+$frm = 'frm_importacao';
+$id_col = 'id_nota';
+
+/* Load this screen's permissions for current user */
+/*
+if (isset($_SESSION['user']['permissions'][$frm])) {
+	$access = $_SESSION['user']['permissions'][$frm];
+} else {
+	print '<div class="msg fail"><span class="icon"></span>Acesso restrito. Consulte um administrador para solicitar permissão para visualizar esta página.</div>';
+	die;
+}
+*/
 
 $MSG_PADRAO_ARQUIVO_CSV = 'Informe um arquivo .CSV para importação';
 $EXTENSAO_VALIDA = 'csv';
@@ -6,6 +20,9 @@ $EXTENSAO_VALIDA = 'csv';
 if (isset($_FILES['arquivo'])) {
 	$filename = $_FILES['arquivo']['tmp_name'];
   $lines = count(file($filename));
+
+  date_default_timezone_set('America/Sao_Paulo');
+  $import_timestamp = date('Y-m-d H:i:s');
 
 	/*valores constantes, posições das colunas*/
 	$CONS_NUM_NOTA = 0; #Número da Nota;
@@ -27,6 +44,18 @@ if (isset($_FILES['arquivo'])) {
 		return str_replace(',', '.', str_replace('.', '', preg_replace("/[^0-9,.]/", "", $oldValue)));
 	}
 
+  function dateconvert($date, $func) {
+    if ($func == 1){ //insert conversion
+      list($day, $month, $year) = preg_split('/[-\.\/ ]/', $date); 
+      $date = "$year-$month-$day"; 
+      return $date;
+    }
+    if ($func == 2){ //output conversion
+      list($year, $month, $day) = preg_split('/[-\.\/ ]/', $date); 
+      $date = "$day/$month/$year"; 
+      return $date;
+    }
+  }
 	/* abrir arquivo em modo leitura */
   $file_handle = fopen($filename, "r");
   $count = 0;
@@ -38,8 +67,29 @@ if (isset($_FILES['arquivo'])) {
   }
   fclose($file_handle);
 
+  include_once('class.db.php');
+  $db = new db();
+  
+  $st = true;
   foreach ($arr as $item) {
     if (count($item) > 1 && is_numeric($item[$CONS_NUM_NOTA])) {
+      $cols = array('data_importacao' => $import_timestamp,
+                    'csv_numero_nota' => $item[$CONS_NUM_NOTA],
+                    'csv_valor_nota' => onlyNumbersMonetary($item[$CONS_VALOR_NOTA]),
+                    'csv_data_nota' => dateconvert($item[$CONS_DATA_NOTA], 1),
+                    'csv_cnpj_entidade_social' => onlyNumbers($item[$CONS_CNPJ_ENT_SOCIAL]),
+                    'csv_cpf_cadastrador' => onlyNumbers($item[$CONS_CPF_DOADOR_CADASTRADOR]),
+                    'csv_data_pedido' => dateconvert($item[$CONS_DATA_PEDIDO], 1),
+                    'csv_status_pedido' => $item[$CONS_STATUS_PEDIDO],
+                    'csv_tipo_pedido' => $item[$CONS_TIPO_PEDIDO],
+                    'csv_cnpj_estabelecimento' => onlyNumbers($item[$CONS_CNPJ_ESTABELECIMENTO]),
+                    'csv_razao_social_estab' => $item[$CONS_RAZAO_SOCIAL_ESTABELECIMENTO],
+                    );
+    if (!$db->insert('lr_importa_arquivo_nota', $cols)) {
+      print '<div class="msg fail"><span class="icon"></span>Não foi possível salvar o registro.</div>';
+      $st = false;
+    }
+      /*
       $num_nota = $arr[$CONS_NUM_NOTA];
       $valor_nota = onlyNumbersMonetary($arr[$CONS_VALOR_NOTA]);
       $data_nota = $arr[$CONS_DATA_NOTA];
@@ -50,13 +100,9 @@ if (isset($_FILES['arquivo'])) {
       $tipo_pedido = $arr[$CONS_TIPO_PEDIDO];
       $cnpj_estabelecimento = onlyNumbers($arr[$CONS_CNPJ_ESTABELECIMENTO]);
       $razao_social_estabelecimento = $arr[$CONS_RAZAO_SOCIAL_ESTABELECIMENTO];
+      */
     }
   }
-
-print '<pre>';
-//print_r ($arr);
-print $i .'</pre>';
-die;
 }
 ?>
 
