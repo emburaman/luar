@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS `lr_empresa` (
   `nome_responsavel` varchar(255) NULL,
   `telefone_responsavel` varchar(255) NULL,
   `email_responsavel` varchar(255) NULL,
-  `id_nucleo` int(11) NOT NULL,
-  `id_voluntario_captador` int(11) NOT NULL,
+  `id_nucleo` int(11)  NULL,
+  `id_voluntario_captador` int(11)  NULL,
   `observacao` text NULL,
   PRIMARY KEY (`id_empresa`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
