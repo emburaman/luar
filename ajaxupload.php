@@ -96,6 +96,12 @@
 		      return $date;
 		    }
 		  }
+		  function validaNotaImportacao($cols, $db) {
+		  	$table_importacao = 'lr_importa_arquivo_nota';
+		  	$arr_nota = $db->select($table_importacao,'id_importa_arquivo_nota', "csv_numero_nota = ". $cols['csv_numero_nota'] ." and csv_data_nota = '". $cols['csv_data_nota'] ."' and csv_valor_nota = ". $cols['csv_valor_nota']);
+
+		  	return count($arr_nota[0]) > 0;
+		  }
 		  function obterIdVoluntario($cpf, $db) {
 		    $arr_cpf_cadastrador = $db->select('lr_voluntario','id_voluntario', "cpf = ". $cpf);
 
@@ -169,6 +175,10 @@
 		                    'csv_cnpj_estabelecimento' => $cnpj_estabelecimento,
 		                    'csv_razao_social_estab' => $nome_estabelecimento
 		                    );
+
+		      #valida se a mesma nota ja se encontra na base de dados
+		      if (validaNotaImportacao($cols, $db))
+		      	continue;
 
 		      #busca em lr_voluntario pelo cpf e retorna o id_voluntario, caso não encontre o voluntario insere o registro
 		      $id_voluntario = obterIdVoluntario($cpf_cadastrador, $db);
