@@ -49,11 +49,6 @@ insert into lr_config_acesso_tipo_volunt values (3, 3, 'C');
 insert into lr_config_acesso_tipo_volunt values (4, 1, 'C');
 insert into lr_config_acesso_tipo_volunt values (4, 2, 'C');
 insert into lr_config_acesso_tipo_volunt values (4, 3, 'C');
---
--- Inserindo `lr_usuario`
---
-
-insert into lr_usuario (username, senha) values ('rysimizu', '8e53265909fd2ae0d93f095ff225a35cae842ecf');
 
 --
 --
