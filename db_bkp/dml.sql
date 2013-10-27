@@ -13,17 +13,6 @@ INSERT INTO `lr_status` (`id_status`, `descricao`) VALUES
 insert into lr_entidade (descricao) values ('Igreja Metodista Livre - Sorocaba');
 
 --
--- Table structure for table `lr_tela`
---
-
-insert into lr_tela (nome) values ('FRM_VOLUNTARIO');
-insert into lr_tela (nome) values ('FRM_NUCLEO');
-insert into lr_tela (nome) values ('FRM_EMPRESA');
-insert into lr_tela (nome) values ('FRM_USUARIO');
-insert into lr_tela (nome) values ('FRM_ENTIDADE');
-insert into lr_tela (nome) values ('FRM_IMPORTCSV');
-
---
 -- Inserindo `lr_tipo_voluntario`
 --
 
@@ -32,7 +21,17 @@ insert into lr_tipo_voluntario (descricao) values ('Coordenador');
 insert into lr_tipo_voluntario (descricao) values ('Captador');
 insert into lr_tipo_voluntario (descricao) values ('Digitador');
 
--- --------------------------------------------------------
+--
+-- Table structure for table `lr_tela`
+--
+
+insert into lr_tela (nome) values ('FRM_VOLUNTARIO');
+insert into lr_tela (nome) values ('FRM_NUCLEO');
+insert into lr_tela (nome) values ('FRM_EMPRESA');
+insert into lr_tela (nome) values ('FRM_USUARIO');
+insert into lr_tela (nome) values ('FRM_ENTIDADE');
+insert into lr_tela (nome) values ('FRM_IMPORTACAO');
+
 
 --
 -- Inserindo lr_config_acesso_tipo_volunt
@@ -68,7 +67,44 @@ insert into lr_nucleo (descricao) values ('CARLOS AMENDOEIRA');
 --
 -- Inserindo `lr_status_nota`
 --
-
 insert into lr_status_nota (cod_status_nota, descricao) values ('CADASTRADA', 'Cadastrada');
 insert into lr_status_nota (cod_status_nota, descricao) values ('CREDITO_LIBERADO', 'Crédito Liberado');
-
+--
+-- Inserindo lr_rel_acesso_usuario_tela
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('rysimizu', 1, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('rysimizu', 2, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('rysimizu', 3, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('rysimizu', 4, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('rysimizu', 5, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('rysimizu', 6, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('emburaman', 1, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('emburaman', 2, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('emburaman', 3, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('emburaman', 4, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('emburaman', 5, 'T');
+--
+insert into lr_rel_acesso_usuario_tela (username, id_tela, cod_nivel_acesso)
+                                values ('emburaman', 6, 'T');
+--
