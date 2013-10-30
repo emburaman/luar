@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `lr_usuario` (
 
 insert into `lr_usuario` (`username`, `senha`) values ('rysimizu', '8e53265909fd2ae0d93f095ff225a35cae842ecf');
 INSERT INTO `lr_usuario` (`username`,`senha`) VALUES ('emburaman', '71ba46ab6ae4dc109035996f618d74636b8cc38d');
-
+INSERT INTO `lr_usuario` (`username`,`senha`) VALUES ('etani', '7c4a8d09ca3762af61e59520943dc26494f8941b');
 --
 -- Table structure for table `lr_status`
 --

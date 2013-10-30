@@ -19,6 +19,7 @@ insert into lr_entidade (descricao) values ('Igreja Metodista Livre - Sorocaba')
 insert into lr_tipo_voluntario (descricao) values ('Administrador');
 insert into lr_tipo_voluntario (descricao) values ('Coordenador');
 insert into lr_tipo_voluntario (descricao) values ('Captador');
+insert into lr_tipo_voluntario (descricao) values ('Coletor');
 insert into lr_tipo_voluntario (descricao) values ('Digitador');
 
 --
@@ -67,8 +68,12 @@ insert into lr_nucleo (descricao) values ('CARLOS AMENDOEIRA');
 --
 -- Inserindo `lr_status_nota`
 --
-insert into lr_status_nota (cod_status_nota, descricao) values ('CADASTRADA', 'Cadastrada');
+insert into lr_status_nota (cod_status_nota, descricao) values ('CADASTRADA', 'Aguardando registro da nota pelo estabelecimento');
+insert into lr_status_nota (cod_status_nota, descricao) values ('DOC_ENCONTRADO', 'Pedido com documento encontrado');
+insert into lr_status_nota (cod_status_nota, descricao) values ('DOC_NAO_ENCONTRADO', 'Não foi possível encontrar o documento com as informações digitadas');
+insert into lr_status_nota (cod_status_nota, descricao) values ('DOC_DESTINATARIO', 'Documento encontrado com destinatário.Não pode ser doado.');
 insert into lr_status_nota (cod_status_nota, descricao) values ('CREDITO_LIBERADO', 'Crédito Liberado');
+     
 --
 -- Inserindo lr_rel_acesso_usuario_tela
 --
